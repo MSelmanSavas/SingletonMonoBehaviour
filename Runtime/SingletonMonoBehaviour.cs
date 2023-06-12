@@ -52,12 +52,8 @@ namespace SingletonMonoBehaviour
             }
         }
 
-        [Sirenix.OdinInspector.ShowInInspector]
-        [Sirenix.OdinInspector.ReadOnly]
         protected static T _instance;
 
-        [Sirenix.OdinInspector.ShowInInspector]
-        [Sirenix.OdinInspector.ReadOnly]
         protected static T _editorInstance;
 
         protected virtual bool dontDestroyOnLoad => false;
