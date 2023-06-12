@@ -10,11 +10,9 @@ namespace SingletonMonoBehaviour
             {
                 if (Application.isEditor && !Application.isPlaying)
                 {
-                    //Debug.LogError("get _editorInstance : " + _editorInstance);
                     return _editorInstance;
                 }
 
-                //Debug.LogError("get _instance : " + _instance);
                 if (_instance == null)
                 {
                     _instance = FindObjectOfType<T>();
@@ -35,7 +33,6 @@ namespace SingletonMonoBehaviour
                 if (Application.isEditor && !Application.isPlaying)
                 {
                     _editorInstance = value;
-                    //Debug.LogError("set _editorInstance : " + _editorInstance);
                     return;
                 }
 
@@ -52,7 +49,6 @@ namespace SingletonMonoBehaviour
                 }
 
                 _instance = value;
-                //Debug.LogError("set _instance : " + _instance);
             }
         }
 
@@ -64,12 +60,14 @@ namespace SingletonMonoBehaviour
         [Sirenix.OdinInspector.ReadOnly]
         protected static T _editorInstance;
 
+        protected virtual bool dontDestroyOnLoad => false;
+
 #if UNITY_EDITOR
 
         /// <summary>
         /// Used for SingletonMonoBehaviour logic. Please use OnValidateInternal instead;
         /// </summary>
-        private void OnValidate()
+        protected void OnValidate()
         {
             if (UnityEditor.SceneManagement.PrefabStageUtility.GetCurrentPrefabStage() != null ||
                 UnityEditor.PrefabUtility.IsPartOfPrefabAsset(gameObject))
@@ -80,26 +78,29 @@ namespace SingletonMonoBehaviour
         }
 #endif
 
-        protected abstract void OnValidateInternal();
+        protected virtual void OnValidateInternal() { }
 
         /// <summary>
         /// Used for SingletonMonoBehaviour logic. Please use AwakeInternal instead;
         /// </summary>
-        private void Awake()
+        protected void Awake()
         {
             //Debug.LogError("Awake Instance : " + _instance);
             if (_instance != null && _instance != this)
             {
-                Destroy(this);
+                Destroy(gameObject);
                 return;
             }
 
             _instance = this as T;
 
+            if (dontDestroyOnLoad)
+                DontDestroyOnLoad(this);
+
             AwakeInternal();
         }
 
-        protected abstract void AwakeInternal();
+        protected virtual void AwakeInternal() { }
     }
 
 }
